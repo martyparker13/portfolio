@@ -1,0 +1,11 @@
+# Files never to upload with `vercel deploy`.
+# Env vars must come from the Vercel dashboard, not a bundled file.
+.env
+.env.*
+!.env.example
+
+.git
+.next
+dist
+node_modules
+.sanity
