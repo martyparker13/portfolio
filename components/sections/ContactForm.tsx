@@ -56,6 +56,18 @@ export function ContactForm() {
       )}
 
       <form className="space-y-3 @md/form:space-y-4" onSubmit={handleSubmit}>
+        {/* Honeypot: hidden from users, catches bots. Keep it un-focusable. */}
+        <div aria-hidden="true" className="hidden">
+          <label htmlFor="company">Company</label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         <div>
           <label
             htmlFor="name"
@@ -67,6 +79,7 @@ export function ContactForm() {
             type="text"
             id="name"
             name="name"
+            maxLength={100}
             className="w-full px-3 py-1.5 @md/form:px-4 @md/form:py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm @md/form:text-base"
             placeholder="Your name"
             required
@@ -85,6 +98,7 @@ export function ContactForm() {
             type="email"
             id="email"
             name="email"
+            maxLength={200}
             className="w-full px-3 py-1.5 @md/form:px-4 @md/form:py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm @md/form:text-base"
             placeholder="your.email@example.com"
             required
@@ -103,6 +117,7 @@ export function ContactForm() {
             type="text"
             id="subject"
             name="subject"
+            maxLength={150}
             className="w-full px-3 py-1.5 @md/form:px-4 @md/form:py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm @md/form:text-base"
             placeholder="What's this about?"
             required
@@ -121,6 +136,7 @@ export function ContactForm() {
             id="message"
             name="message"
             rows={5}
+            maxLength={5000}
             className="w-full px-3 py-1.5 @md/form:px-4 @md/form:py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none text-sm @md/form:text-base"
             placeholder="Tell me about your project..."
             required
