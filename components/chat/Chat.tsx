@@ -1,7 +1,9 @@
 "use client";
 
 import { ChatKit, useChatKit } from "@openai/chatkit-react";
+import { useTheme } from "next-themes";
 import { createSession } from "@/app/actions/create-session";
+import { getThemeConfig } from "@/lib/config";
 import type { CHAT_PROFILE_QUERYResult } from "@/sanity.types";
 import { useSidebar } from "../ui/sidebar";
 
@@ -11,6 +13,8 @@ export function Chat({
   profile: CHAT_PROFILE_QUERYResult | null;
 }) {
   const { toggleSidebar } = useSidebar();
+  const { resolvedTheme } = useTheme();
+
   // Generate greeting based on available profile data
   const getGreeting = () => {
     if (!profile?.firstName) {
@@ -33,7 +37,7 @@ export function Chat({
       },
     },
     // https://chatkit.studio/playground
-    theme: {},
+    theme: getThemeConfig(resolvedTheme === "dark" ? "dark" : "light"),
     header: {
       title: {
         text: `Chat with ${profile?.firstName || "Me"} `,

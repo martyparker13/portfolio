@@ -24,10 +24,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://martyparker.site";
+const DESCRIPTION =
+  "Certified SAFe Product Owner / Product Manager with 11+ years delivering scalable digital products across banking, financial services, travel, retail, and legal.";
+
 export const metadata: Metadata = {
-  title: "Marty Parker",
-  description:
-    "Next-Gen AI Portfolio with NEXT.JS 16 (OpenAI AgentKit, MCP, Sanity, Clerk",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Marty Parker",
+    template: "%s | Marty Parker",
+  },
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Marty Parker",
+    title: "Marty Parker",
+    description: DESCRIPTION,
+    // TODO: add app/(portfolio)/opengraph-image.tsx for a rich preview card
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Marty Parker",
+    description: DESCRIPTION,
+  },
+  robots: { index: true, follow: true },
 };
 
 export default async function RootLayout({
