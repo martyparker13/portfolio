@@ -9,6 +9,10 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
 
 export default defineCliConfig({
   api: { projectId, dataset },
+  deployment: {
+    // Pins the Studio app so `sanity deploy` / CI don't prompt for a hostname.
+    appId: "weqhiu2kbk116loyywb3khve",
+  },
   typegen: {
     path: "./{app,components,sanity}/**/*.{ts,tsx,js,jsx}",
     schema: "schema.json",
