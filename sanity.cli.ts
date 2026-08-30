@@ -15,4 +15,12 @@ export default defineCliConfig({
     generates: "./sanity.types.ts",
     overloadClientMethods: true,
   },
+  // The Studio build runs through Vite, which would otherwise auto-load the
+  // app's root postcss.config.mjs (Tailwind v4 / Next.js). Vite's PostCSS
+  // loader rejects string plugin names, so give the Studio an empty inline
+  // PostCSS config — it uses styled-components and needs no PostCSS.
+  vite: (config) => ({
+    ...config,
+    css: { ...config.css, postcss: {} },
+  }),
 });
