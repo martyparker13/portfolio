@@ -4,7 +4,7 @@
  * This configuration is used to for the Sanity Studio that's mounted on the `/app/studio/[[...tool]]/page.tsx` route
  */
 
-import { RocketIcon } from "@sanity/icons";
+import { RocketIcon } from "@sanity/icons/Rocket";
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";

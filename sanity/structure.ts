@@ -1,19 +1,18 @@
-import {
-  AsteriskIcon,
-  BookIcon,
-  CaseIcon,
-  CogIcon,
-  CommentIcon,
-  ComposeIcon,
-  DocumentIcon,
-  DocumentsIcon,
-  InlineIcon,
-  ProjectsIcon,
-  RocketIcon,
-  StarIcon,
-  TagIcon,
-  UserIcon,
-} from "@sanity/icons";
+// @sanity/icons v5 removed the barrel exports; each icon has its own subpath.
+import { AsteriskIcon } from "@sanity/icons/Asterisk";
+import { BookIcon } from "@sanity/icons/Book";
+import { CaseIcon } from "@sanity/icons/Case";
+import { CogIcon } from "@sanity/icons/Cog";
+import { CommentIcon } from "@sanity/icons/Comment";
+import { ComposeIcon } from "@sanity/icons/Compose";
+import { DocumentIcon } from "@sanity/icons/Document";
+import { DocumentsIcon } from "@sanity/icons/Documents";
+import { InlineIcon } from "@sanity/icons/Inline";
+import { ProjectsIcon } from "@sanity/icons/Projects";
+import { RocketIcon } from "@sanity/icons/Rocket";
+import { StarIcon } from "@sanity/icons/Star";
+import { TagIcon } from "@sanity/icons/Tag";
+import { UserIcon } from "@sanity/icons/User";
 import type { StructureResolver } from "sanity/structure";
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
