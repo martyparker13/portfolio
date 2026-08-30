@@ -23,7 +23,12 @@ const CHAT_PROFILE_QUERY = defineQuery(`*[_id == "singleton-profile"][0]{
   }`);
 
 async function ChatWrapper() {
-  const { data: profile } = await sanityFetch({ query: CHAT_PROFILE_QUERY });
+  // stega: false -> the chat panel has no visual-editing overlays, and it
+  // keeps the result type clean for the generated CHAT_PROFILE_QUERY_RESULT.
+  const { data: profile } = await sanityFetch({
+    query: CHAT_PROFILE_QUERY,
+    stega: false,
+  });
 
   return (
     <div className="h-full w-full">
