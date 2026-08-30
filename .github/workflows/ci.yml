@@ -30,3 +30,42 @@ jobs:
 
   # The production build (incl. prerender, which needs real Clerk/Sanity keys)
   # runs on Vercel for every push and PR — no need to duplicate it here.
+
+  # Push the Studio schema + manifest to Sanity so the Dashboard / MCP / Agent
+  # tools can introspect the content model. Runs only on main, after checks pass.
+  # Requires a repo secret SANITY_AUTH_TOKEN (a Deploy Studio token from
+  # https://www.sanity.io/manage -> project -> API -> Tokens).
+  deploy-sanity-schema:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID || '2we6aup7' }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET || 'develop' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Guard — SANITY_AUTH_TOKEN must be set
+        run: |
+          if [ -z "$SANITY_AUTH_TOKEN" ]; then
+            echo "::warning::SANITY_AUTH_TOKEN secret is not set — skipping schema deploy."
+            exit 0
+          fi
+
+      # `schema deploy` regenerates the manifest itself (--extract-manifest is
+      # the default), so this one command covers both.
+      - name: Deploy schema + manifest to Sanity
+        if: env.SANITY_AUTH_TOKEN != ''
+        run: pnpm exec sanity schema deploy --verbose
