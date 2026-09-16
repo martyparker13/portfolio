@@ -5,6 +5,7 @@ import { runGuardrails } from "@openai/guardrails";
 import { OpenAI } from "openai";
 import { z } from "zod";
 import { CHAT_MODELS, CHAT_UNAVAILABLE, type ChatStyle } from "./config";
+import { loadChatPortfolioContext } from "./portfolio-context";
 
 /* ------------------------------------------------------------------ *
  * Sanity MCP tool
@@ -123,37 +124,24 @@ couple of things they can ask about (experience, projects, skills, availability,
 how to get in touch).`,
 });
 
-const twin = new Agent({
-  name: "AI Twin",
-  model: CHAT_MODELS.twin,
-  tools: [sanityMcp],
-  modelSettings: { temperature: 0.6 },
-  instructions: `# AI Portfolio Twin — Marty Parker
+const TWIN_BASE_INSTRUCTIONS = `# AI Portfolio Twin — Marty Parker
 
 You ARE Marty Parker. Answer in first person ("I", "my") as if these are your own
 memories. Never say "the portfolio owner" or "according to the data".
 
 ## Knowledge source
-Every fact about your career lives in Sanity CMS (project 2we6aup7, dataset
-"develop"), reachable via the Sanity MCP tools. Before answering a factual
-question, query it:
-- query_documents (GROQ) for specifics — experience, projects, skills, education,
-  certifications, testimonials, blog, services, contact/availability
-- semantic_search for broad or vague topics ("your AI work", "cloud experience")
-- get_context / list_workspace_schemas once at the start if you need to see
-  what's available
+A preloaded snapshot of profile and work experience is appended below — treat it
+as authoritative for those topics. For projects, skills, education, certifications,
+testimonials, blog, services, or contact details not in the snapshot, use the
+Sanity MCP tools (query_documents / semantic_search) before answering.
 
-Common queries:
-- Profile:        *[_type == "profile"][0]
-- Experience:     *[_type == "experience"] | order(startDate desc)
-- Projects:       *[_type == "project"] | order(_createdAt desc)
-- Skills:         *[_type == "skill"] | order(proficiency desc)
-- Education:      *[_type == "education"] | order(endDate desc)
-- Certifications: *[_type == "certification"] | order(issueDate desc)
+When asked about professional experience, roles, tenure, or years of experience,
+use the snapshot: name specific companies, titles, dates, and highlights. Do not
+give vague generic summaries.
 
 ## Rules
-- Only state facts returned by Sanity. Never invent companies, dates, numbers, or
-  tech. If it isn't there: "I haven't documented that yet."
+- Only state facts from the snapshot or Sanity queries. Never invent companies,
+  dates, numbers, or tech. If it isn't there: "I haven't documented that yet."
 - Never expose the machinery — no "let me query", "from the CMS", "running a
   tool", no GROQ, no mention of Sanity / MCP / embeddings.
 - Match the requested style: Crisp = 2-3 sentences; Clear = 4-6 (default);
@@ -162,8 +150,24 @@ Common queries:
 - End with a light follow-up offer when it fits.
 
 You are Marty having a real conversation about your work — specific, humble,
-confident.`,
-});
+confident.`;
+
+function createTwin(portfolioSnapshot: string): Agent {
+  const instructions = portfolioSnapshot.trim()
+    ? `${TWIN_BASE_INSTRUCTIONS}
+
+## Preloaded portfolio snapshot (use for experience / profile answers)
+${portfolioSnapshot}`
+    : TWIN_BASE_INSTRUCTIONS;
+
+  return new Agent({
+    name: "AI Twin",
+    model: CHAT_MODELS.twin,
+    tools: [sanityMcp],
+    modelSettings: { temperature: 0.6 },
+    instructions,
+  });
+}
 
 /* ------------------------------------------------------------------ *
  * Public API
@@ -214,8 +218,13 @@ export async function runChat({
   if (!latest.trim()) return staticStream(CHAT_UNAVAILABLE);
 
   try {
-    // 1. Topic gate (non-streaming, cheap)
-    const gate = await run(topicFilter, toInput(messages));
+    const portfolioSnapshot = await loadChatPortfolioContext();
+
+    // 1. Topic gate (non-streaming, cheap) — classify latest turn only
+    const gate = await run(
+      topicFilter,
+      toInput([{ role: "user", content: latest }]),
+    );
     if (gate.finalOutput?.is_appropriate !== true) {
       const declined = await run(declineAgent, toInput(messages), {
         stream: true,
@@ -244,7 +253,13 @@ export async function runChat({
       { role: "user", content: cleaned },
       { role: "user", content: `(Respond in the "${style}" style.)` },
     ];
-    const answer = await run(twin, toInput(twinInput), { stream: true });
+    const answer = await run(
+      createTwin(portfolioSnapshot),
+      toInput(twinInput),
+      {
+        stream: true,
+      },
+    );
     return asTextStream(answer.toTextStream());
   } catch (err) {
     console.error("runChat failed:", err);
