@@ -1,5 +1,11 @@
 "use client";
-import WorldMap from "@/components/ui/world-map";
+
+import dynamic from "next/dynamic";
+
+const WorldMap = dynamic(() => import("@/components/ui/world-map"), {
+  ssr: false,
+  loading: () => <div className="w-full aspect-[2/1] rounded-lg" aria-hidden />,
+});
 
 export default function WorldMapDemo() {
   return (
