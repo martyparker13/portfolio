@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ModeToggle } from "@/components/DarkModeToggle";
 import { DisableDraftMode } from "@/components/DisableDraftMode";
 import { FloatingDock } from "@/components/FloatingDock";
+import { FloatingGetInTouchCta } from "@/components/FloatingGetInTouchCta";
 import SidebarToggle from "@/components/SidebarToggle";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -74,6 +75,7 @@ export default async function RootLayout({
               <AppSidebar side="right" />
 
               <FloatingDock />
+              <FloatingGetInTouchCta />
               <SidebarToggle />
 
               {/* Mode Toggle - Desktop: bottom right next to AI chat, Mobile: top right next to burger menu */}
