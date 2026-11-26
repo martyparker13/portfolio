@@ -10,6 +10,8 @@ const NAVIGATION_QUERY =
   isExternal
 }`);
 
+const HIDDEN_NAV_TITLES = new Set(["Achievements", "GitHub"]);
+
 export async function FloatingDock() {
   const { data: navItems } = await sanityFetch({ query: NAVIGATION_QUERY });
 
@@ -17,5 +19,13 @@ export async function FloatingDock() {
     return null;
   }
 
-  return <FloatingDockClient navItems={navItems} />;
+  const visibleNavItems = navItems.filter(
+    (item) => !HIDDEN_NAV_TITLES.has(item.title ?? ""),
+  );
+
+  if (visibleNavItems.length === 0) {
+    return null;
+  }
+
+  return <FloatingDockClient navItems={visibleNavItems} />;
 }
